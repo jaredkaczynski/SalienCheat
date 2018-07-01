@@ -1,4 +1,5 @@
 @echo off
+cd %~dp0
 setlocal enabledelayedexpansion
 
 if not exist php\php.exe (
@@ -21,6 +22,5 @@ if not exist token.txt (
 
 echo The script can be terminated at any time by pressing Ctrl-C
 
-:start
 php\php.exe -f cheat.php
-goto start
+pause
