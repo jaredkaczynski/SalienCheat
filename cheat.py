@@ -470,7 +470,7 @@ class Saliens(requests.Session):
                  
     #Send boss damage with heal ability, damage 0, damage to boss 1
     def report_boss_damage(self,heal):
-        return self.spost('ITerritoryControlMinigameService/ReportBossDamage', {'damage_to_boss': 1,'damage_taken':0,'use_heal_ability':heal})
+        return self.spost('ITerritoryControlMinigameService/ReportBossDamage', {'damage_to_boss': randint(1,250),'damage_taken':0,'use_heal_ability':heal})
         
 # ----- MAIN -------
 
