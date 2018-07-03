@@ -98,7 +98,10 @@ class Saliens(requests.Session):
                 resp = self.post(self.api_url % endpoint, data=form_fields)
 
                 eresult = int(resp.headers.get('X-eresult', -1))
-
+                
+                if(eresult == 11 and endpoint == "ITerritoryControlMinigameService/ReportBossDamage")
+                    return rdata
+                
                 if resp.status_code != 200:
                     raise Exception("HTTP %s EResult %s\n%s" % (resp.status_code, eresult, resp.text))
 
@@ -469,8 +472,8 @@ class Saliens(requests.Session):
                  )
                  
     #Send boss damage with heal ability, damage 0, damage to boss 1
-    def report_boss_damage(self,heal):
-        return self.spost('ITerritoryControlMinigameService/ReportBossDamage', {'damage_to_boss': 1,'damage_taken':0,'use_heal_ability':heal})
+    def report_boss_damage(self,heal,damage):
+        return self.spost('ITerritoryControlMinigameService/ReportBossDamage', {'damage_to_boss': damage,'damage_taken':0,'use_heal_ability':heal})
         
 # ----- MAIN -------
 
@@ -642,7 +645,7 @@ try:
                         if (next_loop+5) < time():
                             next_loop = time()
                             #send boss damage
-                            full_response = game.report_boss_damage(heal);
+                            full_response = game.report_boss_damage(heal,1);
                             #on E11, restart, bugged for now, fix it later
                             if 'headers' in full_response and int(full_response.headers.get('X-eresult', -1)) == 11:
                                 game.log("Got invalid state. Restarting")
