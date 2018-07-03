@@ -653,6 +653,7 @@ try:
                             if 'headers' in full_response and int(full_response.headers.get('X-eresult', -1)) == 11:
                                 game.log("Got invalid state. Restarting")
                                 deadline = 0
+                                sleep(2)
                                 break;
                             response = full_response['response']
                             #If there is a battle complete field
