@@ -99,7 +99,7 @@ class Saliens(requests.Session):
 
                 eresult = int(resp.headers.get('X-eresult', -1))
                 
-                if(eresult == 11 and endpoint == "ITerritoryControlMinigameService/ReportBossDamage")
+                if eresult == 11 and endpoint == "ITerritoryControlMinigameService/ReportBossDamage":
                     return rdata
                 
                 if resp.status_code != 200:
