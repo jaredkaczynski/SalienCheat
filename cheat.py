@@ -378,7 +378,10 @@ class Saliens(requests.Session):
 
         # level progress bar
         self.level_pbar.desc = "Level {level}".format(**player_info)
-        self.level_pbar.total = int(player_info['next_level_score'])
+        if 'next_level_score' in player_info:
+            self.level_pbar.total = int(player_info['next_level_score'])
+        else:
+            self.level_pbar.total = 0
         avg_time(self.level_pbar, int(player_info['score']))
         self.level_pbar.refresh()
 
