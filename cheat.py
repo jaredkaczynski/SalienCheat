@@ -105,7 +105,7 @@ class Saliens(requests.Session):
 
                 rdata = resp.json()
                 if eresult == 11 and endpoint == "ITerritoryControlMinigameService/ReportBossDamage":
-                    return rdata
+                    return resp
                 if 'response' not in rdata:
                     raise Exception("NoJSON EResult %s" % eresult)
                     
