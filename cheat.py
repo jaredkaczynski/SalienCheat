@@ -99,15 +99,16 @@ class Saliens(requests.Session):
 
                 eresult = int(resp.headers.get('X-eresult', -1))
                 
-                if eresult == 11 and endpoint == "ITerritoryControlMinigameService/ReportBossDamage":
-                    return rdata
                 
                 if resp.status_code != 200:
                     raise Exception("HTTP %s EResult %s\n%s" % (resp.status_code, eresult, resp.text))
 
                 rdata = resp.json()
+                if eresult == 11 and endpoint == "ITerritoryControlMinigameService/ReportBossDamage":
+                    return rdata
                 if 'response' not in rdata:
                     raise Exception("NoJSON EResult %s" % eresult)
+                    
             except Exception as exp:
                 self.log("^RED-- POST %-46s %s", endpoint, str(exp))
 
@@ -121,8 +122,6 @@ class Saliens(requests.Session):
                     sleep(3)
                     continue
                 data = rdata['response']
-                #this should return full data only when response is set
-                full_response = rdata
 
             if not retry:
                 break
@@ -130,7 +129,7 @@ class Saliens(requests.Session):
             if not data:
                 sleep(1)
 
-        return rdata
+        return data
 
     def sget(self, endpoint, query_params=None, retry=False, timeout=15):
         data = None
@@ -182,7 +181,7 @@ class Saliens(requests.Session):
             sleep(2)
 
     def refresh_player_info(self):
-        self.player_info = self.spost('ITerritoryControlMinigameService/GetPlayerInfo', retry=True)['response']
+        self.player_info = self.spost('ITerritoryControlMinigameService/GetPlayerInfo', retry=True)
         return self.player_info
 
     def refresh_planet_info(self, retry=True, timeout=15):
@@ -267,26 +266,26 @@ class Saliens(requests.Session):
                       )
 
     def represent_clan(self, clan_id):
-        return self.spost('ITerritoryControlMinigameService/RepresentClan', {'clanid': clan_id})['response']
+        return self.spost('ITerritoryControlMinigameService/RepresentClan', {'clanid': clan_id})
 
     def report_score(self, score):
-        return self.spost('ITerritoryControlMinigameService/ReportScore', {'score': score})['response']
+        return self.spost('ITerritoryControlMinigameService/ReportScore', {'score': score})
 
     def join_planet(self, pid):
-        return self.spost('ITerritoryControlMinigameService/JoinPlanet', {'id': pid})['response']
+        return self.spost('ITerritoryControlMinigameService/JoinPlanet', {'id': pid})
 
     def join_zone(self, pos):
         self.zone_id = pos
-        return self.spost('ITerritoryControlMinigameService/JoinZone', {'zone_position': pos})['response']
+        return self.spost('ITerritoryControlMinigameService/JoinZone', {'zone_position': pos})
     def join_zone_boss(self, pos):
         self.zone_id = pos
-        return self.spost('ITerritoryControlMinigameService/JoinBossZone', {'zone_position': pos})['response']
+        return self.spost('ITerritoryControlMinigameService/JoinBossZone', {'zone_position': pos})
         
     def leave_zone(self, clear_rate=True):
         if 'active_zone_game' in self.player_info:
             self.spost('IMiniGameService/LeaveGame',
                        {'gameid': self.player_info['active_zone_game']},
-                       retry=False)['response']
+                       retry=False)
         self.zone_id = None
 
         if clear_rate:
@@ -296,7 +295,7 @@ class Saliens(requests.Session):
         if 'active_planet' in self.player_info:
             self.spost('IMiniGameService/LeaveGame',
                        {'gameid': self.player_info['active_planet']},
-                       retry=False)['response']
+                       retry=False)
 
     def pbar_init(self):
         self.level_pbar = tqdm(ascii=True,
@@ -648,14 +647,13 @@ try:
                         if (next_loop+5) < time():
                             next_loop = time()
                             #send boss damage
-                            full_response = game.report_boss_damage(heal,1);
+                            response = game.report_boss_damage(heal,1);
                             #on E11, restart, bugged for now, fix it later
-                            if 'headers' in full_response and int(full_response.headers.get('X-eresult', -1)) == 11:
+                            if 'headers' in response and int(response.headers.get('X-eresult', -1)) == 11:
                                 game.log("Got invalid state. Restarting")
                                 deadline = 0
                                 sleep(2)
                                 break;
-                            response = full_response['response']
                             #If there is a battle complete field
                             if(response.get('game_over') and response.get('game_over')!="" or boss_hp == 0):
                                 game.log("Boss Battle Completed")
